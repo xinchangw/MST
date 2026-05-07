@@ -1,8 +1,8 @@
 
 #from GenMNL import GenMNL
-from mst import MST
+from src.mst import MST
 import numpy as np
-from cart_customerfeats_in_leafmod import append_customer_features_to_product_features
+from src.cart_customerfeats_in_leafmod import append_customer_features_to_product_features
 # import pandas as pd
 
 

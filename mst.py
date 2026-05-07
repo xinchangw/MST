@@ -848,12 +848,13 @@ def fast_avg(x,weights):
 #Here, split_var can be a vector of observations
 def which_child_multi(split_var, val2child):
   children = [None]*len(split_var)
+  fallback_child = next(iter(val2child.values()))
   for i,v in enumerate(split_var):
     if v in val2child:
       children[i] = val2child[v]
     else:
-      #we didn't observe this value of split_var in the training data. Send observation down random branch.
-      children[i] = val2child.values()[0]
+      # Use the first available child without materializing dict values on every miss.
+      children[i] = fallback_child
   return children
 
 #given an array x, outputs:

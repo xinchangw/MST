@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # coding: utf-8
 
 
@@ -187,8 +187,8 @@ for iD in range(10):
             for epoch in range(EPOCHS):
               try:
                   # Reset the metrics at the start of the next epoch
-                  train_loss.reset_states()
-                  train_accuracy.reset_states()
+                  train_loss.reset_state()
+                  train_accuracy.reset_state()
                 
                   del train_ds
                   del test_ds
@@ -204,12 +204,12 @@ for iD in range(10):
                          tf.summary.scalar('mse', train_mse.result(), step=epoch)                            
                          
                   if (epoch % 10) == 0:
-                      test_loss.reset_states()
-                      test_accuracy.reset_states()
-                      test_mse.reset_states()                      
-                      val_loss.reset_states()
-                      val_accuracy.reset_states()  
-                      val_mse.reset_states()                       
+                      test_loss.reset_state()
+                      test_accuracy.reset_state()
+                      test_mse.reset_state()
+                      val_loss.reset_state()
+                      val_accuracy.reset_state()
+                      val_mse.reset_state()
                       
                   for val_images, val_labels in val_ds:
                      val_step(val_images, val_labels)
