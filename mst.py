@@ -3,6 +3,8 @@
 MST IMPLEMENTATION
 """
 #import math
+import importlib
+import os
 import numpy as np
 import pandas as pd
 from joblib import Parallel, delayed
@@ -10,8 +12,11 @@ from joblib import Parallel, delayed
 '''
 Import proper leaf model here:
 '''
-from leaf_model_mnl import *
-#from leaf_model_isoreg import *
+_LEAF_MODEL_MODULE_NAME = os.environ.get("MST_LEAF_MODEL", "leaf_model_mnl")
+_leaf_model_module = importlib.import_module(_LEAF_MODEL_MODULE_NAME)
+LeafModel = _leaf_model_module.LeafModel
+get_sub = _leaf_model_module.get_sub
+are_Ys_diverse = _leaf_model_module.are_Ys_diverse
 
 '''
 Market Segmentation Trees (MST)
@@ -614,7 +619,7 @@ class MST(object):
       if (self.tree[n].is_split_var_numeric == True):
         dirs = split_var <= self.tree[n].split_val
       else:
-        dirs = np.in1d(split_var,self.tree[n].split_val)
+        dirs = np.isin(split_var,self.tree[n].split_val)
       
       if (len(np.unique(dirs)) <= 1):
         #unq: a vector giving the unique leaf node indices corresponding to X
@@ -848,12 +853,13 @@ def fast_avg(x,weights):
 #Here, split_var can be a vector of observations
 def which_child_multi(split_var, val2child):
   children = [None]*len(split_var)
+  fallback_child = next(iter(val2child.values()))
   for i,v in enumerate(split_var):
     if v in val2child:
       children[i] = val2child[v]
     else:
-      #we didn't observe this value of split_var in the training data. Send observation down random branch.
-      children[i] = val2child.values()[0]
+      # Use the first available child without materializing dict values on every miss.
+      children[i] = fallback_child
   return children
 
 #given an array x, outputs:
@@ -961,7 +967,7 @@ def _find_best_split_binary(node, tree_params, leaf_params, verbose, X, A, Y, we
     if (verbose==True): print("Node " + str(node.ind)+": Generating Debias Set")
     #extract elements of shuffled_root_inds that are equal to data_inds, maintaining random
     #order of indices
-    tmp = np.in1d(shuffled_root_inds,node.data_inds)
+    tmp = np.isin(shuffled_root_inds,node.data_inds)
     shuffled_node_inds = np.asarray(shuffled_root_inds[tmp])
     #take first debias_set_size entries of shuffled_node_inds to make debias set
     shuffled_node_inds_debias = shuffled_node_inds[:debias_set_size]
@@ -1003,7 +1009,7 @@ def _find_best_split_binary(node, tree_params, leaf_params, verbose, X, A, Y, we
       num_splits = int(np.ceil(1.0/tree_params.quant_discret))-1
       if (num_splits < len(uniq_Xj)-1):
         quants = [tree_params.quant_discret*i*100 for i in range(1,num_splits+1)]
-        candidate_split_vals = np.percentile(uniq_Xj,quants,interpolation="lower")
+        candidate_split_vals = np.percentile(uniq_Xj,quants,method="lower")
       else:
         #simply test all unique values
         candidate_split_vals = uniq_Xj[:(len(uniq_Xj)-1)]
@@ -1220,7 +1226,7 @@ def _find_best_split_binary(node, tree_params, leaf_params, verbose, X, A, Y, we
       if feats_continuous[j] == True:
         tmp = (Xj <= split_vals[j])
       else:
-        tmp = np.in1d(Xj, split_vals[j])
+        tmp = np.isin(Xj, split_vals[j])
       not_tmp = np.logical_not(tmp)
       A_l,Y_l = get_sub(tmp, A=A_node, Y=Y_node, is_boolvec=True)
       A_r,Y_r = get_sub(not_tmp, A=A_node, Y=Y_node, is_boolvec=True)
@@ -1255,7 +1261,7 @@ def _find_best_split_binary(node, tree_params, leaf_params, verbose, X, A, Y, we
   if feats_continuous[node.split_var_ind] == True:
     tmp = (Xj <= node.split_val)
   else:
-    tmp = np.in1d(Xj, node.split_val)
+    tmp = np.isin(Xj, node.split_val)
   l_split_data_inds = np.array(node.data_inds)[tmp].tolist();
   r_split_data_inds = np.array(node.data_inds)[np.logical_not(tmp)].tolist();
   
@@ -1368,7 +1374,7 @@ def _find_best_split_multiway(node, tree_params, leaf_params, verbose, X, A, Y, 
     if (verbose==True): print("Node " + str(node.ind)+": Generating Debias Set")
     #extract elements of shuffled_root_inds that are equal to data_inds, maintaining random
     #order of indices
-    tmp = np.in1d(shuffled_root_inds,node.data_inds)
+    tmp = np.isin(shuffled_root_inds,node.data_inds)
     shuffled_node_inds = shuffled_root_inds[tmp]
     #take first debias_set_size entries of shuffled_node_inds to make debias set
     shuffled_node_inds_debias = shuffled_node_inds[:debias_set_size]
@@ -1516,7 +1522,7 @@ def _find_best_split_multiway(node, tree_params, leaf_params, verbose, X, A, Y, 
 
 def _perform_split(sub,Xj,weights_train,fit_init_l,fit_init_r,
                    leaf_params, A, Y, sum_weights):
-  tmp = np.in1d(Xj,sub)
+  tmp = np.isin(Xj,sub)
   not_tmp = np.logical_not(tmp)
   A_l,Y_l = get_sub(tmp, A=A, Y=Y,is_boolvec=True)
   A_r,Y_r = get_sub(not_tmp, A=A, Y=Y,is_boolvec=True)
@@ -1534,8 +1540,8 @@ def _perform_split(sub,Xj,weights_train,fit_init_l,fit_init_r,
     #do not consider this split
     l_fitted_model = None
     r_fitted_model = None
-    l_avg_errors = np.float("inf")
-    r_avg_errors = np.float("inf")
+    l_avg_errors = float("inf")
+    r_avg_errors = float("inf")
     
   else:
     l_fitted_model = leaf_mod_l
@@ -1551,7 +1557,7 @@ def _perform_split(sub,Xj,weights_train,fit_init_l,fit_init_r,
   return [l_data, r_data]
 
 def _is_split_legal(sub, Xj, min_weights_per_node, weights):
-  tmp = np.in1d(Xj,sub)
+  tmp = np.isin(Xj,sub)
   not_tmp = np.logical_not(tmp)
   weights_l = np.asarray(weights[tmp]);
   weights_r = np.asarray(weights[not_tmp]);

@@ -2,13 +2,13 @@ This directory provides the scripts to run CMTs and benchmark methods on the Swi
 
 ## Dependencies
 
-All scripts except `tastenet.py` and `mnlint.py` were run with the following dependencies:
+All scripts are now expected to run under Python 3. Install the shared dependencies from the repository root with:
 
-python 2.7.17, joblib 0.13.2, numpy 1.16.6, pandas 0.22.0, rpy2 2.8.6, seaborn 0.9.0, scikit-learn 0.20.3, tensorflow 2.1.0
+`python3 -m pip install -r requirements.txt`
 
-Note that other R dependencies are specified along with the virtual environment of the source code. The scripts `tastenet.py` and `mnlint.py` were run with the following dependencies:
+The SwissMetro scripts use NumPy, pandas, joblib, scikit-learn, seaborn, and TensorFlow. The tree leaf-model code now uses a TF2-compatible training loop instead of TensorFlow Estimator. On Apple Silicon Macs, `tensorflow-metal` is installed automatically through the platform marker in `requirements.txt`.
 
-python 3.8.13, pandas 1.4.2, numpy 1.19.2, tensorflow 2.4.0, tensorboard 2.4.1, tf-nightly 2.5.0, tf-estimator-nightly 2.4.0, keras-preprocessing 1.1.2, keras-tuner 1.1.0
+For the TensorFlow MNL leaf model, training is controlled by `steps`. The `epochs` keyword remains accepted for compatibility with existing scripts but does not change the optimization count.
 
 ## Description of scripts
 
