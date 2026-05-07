@@ -1009,7 +1009,7 @@ def _find_best_split_binary(node, tree_params, leaf_params, verbose, X, A, Y, we
       num_splits = int(np.ceil(1.0/tree_params.quant_discret))-1
       if (num_splits < len(uniq_Xj)-1):
         quants = [tree_params.quant_discret*i*100 for i in range(1,num_splits+1)]
-        candidate_split_vals = np.percentile(uniq_Xj,quants,interpolation="lower")
+        candidate_split_vals = np.percentile(uniq_Xj,quants,method="lower")
       else:
         #simply test all unique values
         candidate_split_vals = uniq_Xj[:(len(uniq_Xj)-1)]
