@@ -1,5 +1,6 @@
 import importlib
 import importlib.util
+import os
 import sys
 import types
 import unittest
@@ -73,6 +74,32 @@ def load_module_from_path(module_name, path):
 
 
 class Python3MigrationTests(unittest.TestCase):
+    def test_mst_respects_leaf_model_environment_setting(self):
+        stub_modules = _stub_modules()
+        leaf_model_isoreg_stub = types.ModuleType("leaf_model_isoreg")
+
+        class IsoLeafModel(object):
+            pass
+
+        leaf_model_isoreg_stub.LeafModel = IsoLeafModel
+        leaf_model_isoreg_stub.get_sub = lambda *args, **kwargs: "isoreg"
+        leaf_model_isoreg_stub.are_Ys_diverse = lambda *args, **kwargs: False
+        stub_modules["leaf_model_isoreg"] = leaf_model_isoreg_stub
+
+        previous_leaf_model = os.environ.get("MST_LEAF_MODEL")
+        os.environ["MST_LEAF_MODEL"] = "leaf_model_isoreg"
+        try:
+            with patched_modules(stub_modules):
+                mst_module = load_module_from_path("mst_test_module", REPO_ROOT / "mst.py")
+            self.assertIs(mst_module.LeafModel, IsoLeafModel)
+            self.assertEqual(mst_module.get_sub(), "isoreg")
+            self.assertFalse(mst_module.are_Ys_diverse(None))
+        finally:
+            if previous_leaf_model is None:
+                os.environ.pop("MST_LEAF_MODEL", None)
+            else:
+                os.environ["MST_LEAF_MODEL"] = previous_leaf_model
+
     def test_mst_which_child_multi_handles_unseen_values(self):
         with patched_modules(_stub_modules()):
             mst_module = load_module_from_path("mst_test_module", REPO_ROOT / "mst.py")

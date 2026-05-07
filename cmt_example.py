@@ -24,6 +24,8 @@ The CMT used to generate the data consists of a single split (x2 <= 0.6), with M
 NOTE: for this to run properly, include the following import statement in mst.py: "from leaf_model_mnl import *"
 '''
 
+import os
+os.environ.setdefault("MST_LEAF_MODEL", "leaf_model_mnl")
 from mst import MST
 from GenMNL import GenMNL
 import numpy as np

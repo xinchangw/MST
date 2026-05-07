@@ -2,11 +2,11 @@ This directory provides the scripts to run CMTs and benchmark methods on the Swi
 
 ## Dependencies
 
-All scripts are now expected to run under Python 3. Install the shared dependencies from the repository root with:
+All scripts are now expected to run under Python 3.11. Install the shared dependencies from the repository root with:
 
 `python3 -m pip install -r requirements.txt`
 
-The SwissMetro scripts use NumPy, pandas, joblib, scikit-learn, seaborn, and TensorFlow. On Apple Silicon Macs, `tensorflow-metal` is installed automatically through the platform marker in `requirements.txt`. The legacy `tensorflow.compat.v1` / Estimator path used by the tree leaf model may still execute on CPU even when the TF2/Keras scripts can use Metal acceleration.
+The SwissMetro scripts use NumPy, pandas, joblib, scikit-learn, seaborn, and TensorFlow. The current tree leaf-model code still requires TensorFlow's Estimator API, so the supported runtime is Python 3.11 with `tensorflow==2.15.*`. On Apple Silicon Macs, `tensorflow-metal` is installed automatically through the platform marker in `requirements.txt`. The legacy `tensorflow.compat.v1` / Estimator path used by the tree leaf model may still execute on CPU even when the TF2/Keras scripts can use Metal acceleration.
 
 ## Description of scripts
 

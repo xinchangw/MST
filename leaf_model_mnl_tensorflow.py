@@ -378,6 +378,13 @@ class LeafModelTensorflow(object):
         '''
         self.loglik_proba_cap = loglik_proba_cap
 #         initialize a tensorflow graph
+        if not hasattr(tf, "estimator"):
+            raise RuntimeError(
+                "The TensorFlow MNL leaf model requires tf.estimator, which is not "
+                "available in this TensorFlow build. Use Python 3.11 with "
+                "tensorflow==2.15.* for the Estimator-based path, or migrate this "
+                "leaf model off Estimator."
+            )
         try:
             if refit == True:
                 steps = steps_refit

@@ -11,9 +11,11 @@ Note that as an additional challenge to the IRT, the leaf nodes of the data-gene
 NOTE: for this to run properly, include the following import statement in mst.py: "from leaf_model_isoreg import *"
 """
 
+import os
 import numpy as np
 import pandas as pd
 
+os.environ.setdefault("MST_LEAF_MODEL", "leaf_model_isoreg")
 from mst import MST
 
 np.set_printoptions(suppress=True) #suppress scientific notation
