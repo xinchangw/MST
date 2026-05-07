@@ -4,5 +4,5 @@ joblib
 scikit-learn
 seaborn
 tensorboard
-tensorflow==2.15.*; python_version < "3.12"
-tensorflow-metal>=1.1; sys_platform == "darwin" and platform_machine == "arm64" and python_version < "3.12"
+tensorflow
+tensorflow-metal; sys_platform == "darwin" and platform_machine == "arm64"

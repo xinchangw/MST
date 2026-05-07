@@ -30,11 +30,11 @@ First, clone the MST repo. This can be done through opening a command prompt / t
 Install the conda command-line tool. This can be accomplished through installing miniforge, miniconda, or anaconda. We advise users to consult the license terms of use for these tools because as of 2023-02-26 miniconda and anaconda are not free for commercial use.
 
 Open a command prompt / terminal and execute the following steps:
-1. Create and activate a Python 3.11 virtual environment, for example with `python3.11 -m venv .venv` and `source .venv/bin/activate`.
+1. Create and activate a Python 3 virtual environment, for example with `python3 -m venv .venv` and `source .venv/bin/activate`.
 2. Upgrade pip: `python3 -m pip install --upgrade pip`
 3. Install the project dependencies from the repository root: `python3 -m pip install -r requirements.txt`
 
-The current CMT / MNL leaf-model implementation still depends on TensorFlow's Estimator API, so the supported runtime is Python 3.11 with `tensorflow==2.15.*`. On Apple Silicon Macs, `requirements.txt` includes `tensorflow-metal` via environment markers. TensorFlow's `compat.v1` / Estimator-based code paths may still run on CPU even when the Keras-based scripts can use Metal acceleration.
+The current CMT / MNL leaf-model implementation uses a TF2-compatible training loop and works with current TensorFlow releases. On Apple Silicon Macs, `requirements.txt` includes `tensorflow-metal` via environment markers.
 
 ## Running the Package Demos / Testing Installation
 
