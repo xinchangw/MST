@@ -52,11 +52,10 @@ def _mnl_probabilities_np(input_features, weights, model_type, is_bias):
     n = input_features.shape[2]
     weight_scaled = _broadcast_weights_np(weights, model_type, n)
     feature_block = input_features if is_bias else input_features[:, 1:, :]
-    logits = np.sum(feature_block * weight_scaled, axis=1)
+    logits = np.einsum("bfn,fn->bn", feature_block, weight_scaled[0], optimize=True)
     masked_logits = np.where(input_features[:, 0, :] > 0, logits, -1.0e9)
     masked_logits = masked_logits - np.max(masked_logits, axis=1, keepdims=True)
     probas = np.exp(masked_logits)
-    probas = np.maximum(probas, 1.0e-5)
     probas = probas / np.sum(probas, axis=1, keepdims=True)
     return logits, probas
 
@@ -94,6 +93,8 @@ class LeafModelTensorflow(object):
         loglik_proba_cap=0,
         **kwargs
     ):
+        # Training is step-driven for compatibility with the historical Estimator
+        # path. The epochs argument is retained for callers but does not alter steps.
         self.loglik_proba_cap = loglik_proba_cap
 
         if mode != "mnl":
@@ -160,7 +161,6 @@ class LeafModelTensorflow(object):
         self.model_coef = params_model
         self.model_quality = {
             "accuracy": float(np.mean(predictions == Y)),
-            "average_rank": _average_rank(probas, Y),
             "loss": weighted_loss,
             "average_choice_probability": float(np.mean(chosen)),
         }

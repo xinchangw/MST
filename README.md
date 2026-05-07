@@ -44,6 +44,8 @@ To test the package installation or demo the package, users can take the followi
 3. We will first demo MST's implementation of Choice Model Trees. Open mst.py. At the top of the file under "Import proper leaf model here:" , ensure that only one leaf model is being imported which should read `from leaf_model_mnl import *`. In command prompt / terminal, execute command `python3 cmt_example.py` which will run the MST on a synthetic choice modeling dataset. At the end of execution, the test set error will be outputted which should be under 0.05.
 4. We will next demo MST's implementation of Isotonic Regression Trees. Open mst.py. At the top of the file under "Import proper leaf model here:" , ensure that only one leaf model is being imported which should read `from leaf_model_isoreg import *`. In command prompt / terminal, execute command `python3 irt_example.py` which will run the MST on a synthetic ad auction dataset. At the end of execution, the test set error will be outputted which should be under 0.05.
 
+For the TensorFlow MNL leaf model, training is controlled by the `steps` argument. The `epochs` argument is retained for compatibility with existing scripts but does not alter the number of optimization steps.
+
 ## Running MSTs on the Swiss Metro dataset
 To run MSTs on the Swiss Metro dataset used by our paper, please take the following steps:
 1. Copy the files leaf_model_mnl_tensorflow.py and mst.py from this repo to the /scripts/src directory

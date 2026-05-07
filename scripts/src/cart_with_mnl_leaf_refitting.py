@@ -1584,8 +1584,8 @@ def _perform_split(sub,Xj,weights_train,fit_init_l,fit_init_r,
     #do not consider this split
     l_fitted_model = None
     r_fitted_model = None
-    l_avg_errors = np.float("inf")
-    r_avg_errors = np.float("inf")
+    l_avg_errors = float("inf")
+    r_avg_errors = float("inf")
     
   else:
     l_fitted_model = leaf_mod_l

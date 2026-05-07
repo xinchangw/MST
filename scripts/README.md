@@ -8,6 +8,8 @@ All scripts are now expected to run under Python 3. Install the shared dependenc
 
 The SwissMetro scripts use NumPy, pandas, joblib, scikit-learn, seaborn, and TensorFlow. The tree leaf-model code now uses a TF2-compatible training loop instead of TensorFlow Estimator. On Apple Silicon Macs, `tensorflow-metal` is installed automatically through the platform marker in `requirements.txt`.
 
+For the TensorFlow MNL leaf model, training is controlled by `steps`. The `epochs` keyword remains accepted for compatibility with existing scripts but does not change the optimization count.
+
 ## Description of scripts
 
 `cmt.py` and `cmt+.py`: estimation of the CMT on the 10 data splits for a maximum depth of 14.

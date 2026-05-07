@@ -7,6 +7,7 @@ import numpy as np
 os.environ.setdefault("MST_LEAF_MODEL", "leaf_model_mnl")
 
 from mst import MST
+from leaf_model_mnl_tensorflow import _mnl_probabilities_np
 
 
 def _choice_probabilities(A, weights, num_features):
@@ -39,6 +40,24 @@ def _make_choice_data(n, rng):
 
 
 class CMTSmokeTests(unittest.TestCase):
+    def test_mnl_probabilities_leave_unavailable_items_at_zero(self):
+        input_features = np.array(
+            [
+                [
+                    [1.0, 0.0, 1.0],
+                    [0.2, 9.0, -0.1],
+                ]
+            ],
+            dtype=np.float32,
+        )
+        weights = np.array([[[0.0, 0.0, 0.0], [1.0, 1.0, 1.0]]], dtype=np.float32)
+
+        _, probas = _mnl_probabilities_np(input_features, weights, model_type=0, is_bias=True)
+
+        self.assertEqual(probas.shape, (1, 3))
+        self.assertEqual(probas[0, 1], 0.0)
+        np.testing.assert_allclose(np.sum(probas, axis=1), np.ones(1), rtol=1e-6)
+
     def test_small_cmt_fit_predict_runs_with_tf2_leaf_model(self):
         rng = np.random.default_rng(0)
         X, A, Y = _make_choice_data(48, rng)
